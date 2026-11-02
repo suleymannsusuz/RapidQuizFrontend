@@ -2,6 +2,10 @@
 
 5 kategoride 20'şer soru soran, soru başına 5 saniye süre tanıyan, üyeliksiz bilgi yarışmasının web istemcisi. Tasarım ve kurallar: `C:\Users\Süleyman\PycharmProjects\RapidQuizBackend\docs\rapid-quiz-proje-dokumani.md` (kaynak doküman). Backend ayrı repoda: `C:\Users\Süleyman\PycharmProjects\RapidQuizBackend` (Django + DRF); API sözleşmesi orada, `CLAUDE.md`'de.
 
+## ÖNCE BUNU OKU: devir notu (2026-11-02)
+
+Projenin **genel durumu, sonraki oturumun işi ve çalışma şekli backend repo'sunun `CLAUDE.md`'sindeki "ÖNCE BUNU OKU: oturum devir notu" bölümünde** (`C:\Users\Süleyman\PycharmProjects\RapidQuizBackend\CLAUDE.md`); orayı da oku. Kısaca: Aşama 1–4 tamam, CI yeşil. Sıradaki iş, kullanıcının DigitalOcean'a **tarayıcıdan elle** deploy etmesi (`doctl` yok): bu repo **Static Site** olarak yayınlanır; değerler (build komutu, `dist`, catch-all `index.html`, `VITE_API_BASE_URL` Build Time) backend repo'sunda `docs/deploy-oturum-notlari.md` dosyasında. `package.json`'a `engines.node >= 24` eklendi (DigitalOcean'ın varsayılan Node'u eskiyse Vite 8 derlemesi düşebilir; düşerse Node sürümünü belgeden doğrula).
+
 ## Değişmez kurallar
 
 - **Doğru cevap, süre ve puan sunucuda belirlenir.** İstemci yalnızca soruyu gösterir ve cevabı iletir; sayaç **yalnızca görseldir**, asıl hakem sunucudur. Sayaç sunucudan gelen `remaining_ms` ile başlar, sıfıra inince `choice_id: null` gönderilir.
