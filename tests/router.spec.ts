@@ -1,6 +1,9 @@
+import { createPinia, setActivePinia } from 'pinia'
 import { createMemoryHistory } from 'vue-router'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createAppRouter } from '@/router'
+import { useQuizStore } from '@/stores/quiz'
+import { makeResult } from './fixtures'
 
 function newRouter() {
   return createAppRouter(createMemoryHistory())
@@ -8,13 +11,28 @@ function newRouter() {
 
 describe('router', () => {
   beforeEach(() => {
+    setActivePinia(createPinia())
     document.title = ''
+  })
+
+  it('biten quiz yokken /result ana sayfaya yönlenir', async () => {
+    const router = newRouter()
+    await router.push('/result')
+
+    expect(router.currentRoute.value.name).toBe('home')
+  })
+
+  it('biten quiz varken /result açılır', async () => {
+    useQuizStore().result = makeResult()
+    const router = newRouter()
+    await router.push('/result')
+
+    expect(router.currentRoute.value.name).toBe('result')
   })
 
   it.each([
     ['/', 'home', {}],
     ['/quiz/yazilim', 'quiz', { category: 'yazilim' }],
-    ['/result', 'result', {}],
     ['/leaderboard', 'leaderboard', {}],
     ['/leaderboard/fizik', 'leaderboard', { category: 'fizik' }],
   ])('%s adresini %s rotasına çözer', async (path, name, params) => {

@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, type RouterHistory } from 'vue-router'
+import { useQuizStore } from '@/stores/quiz'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -31,6 +32,8 @@ export function createAppRouter(history: RouterHistory = createWebHistory()) {
         name: 'result',
         component: () => import('@/views/ResultView.vue'),
         meta: { title: 'Sonuç' },
+        // Biten bir quiz yoksa (ör. sayfa yenilendi) sonuç sayfası boş kalmasın
+        beforeEnter: () => (useQuizStore().result ? true : { name: 'home' }),
       },
       {
         path: '/leaderboard/:category?',

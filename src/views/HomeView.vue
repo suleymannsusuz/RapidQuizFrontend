@@ -5,6 +5,7 @@ import { fetchCategories } from '@/api/categories'
 import { ApiError } from '@/api/errors'
 import type { Category } from '@/api/types'
 import CategoryCard from '@/components/CategoryCard.vue'
+import ErrorMessage from '@/components/ErrorMessage.vue'
 
 const categories = ref<Category[]>([])
 const loading = ref(true)
@@ -42,20 +43,14 @@ onMounted(load)
       <div v-for="n in 5" :key="n" class="h-[76px] animate-pulse rounded-2xl bg-surface/70"></div>
     </div>
 
-    <div
+    <ErrorMessage
       v-else-if="errorMessage"
-      role="alert"
-      class="mt-6 rounded-2xl bg-surface p-5 ring-1 ring-accent/30"
-    >
-      <p class="font-semibold text-ink">{{ errorMessage }}</p>
-      <button
-        type="button"
-        class="mt-3 min-h-11 rounded-xl bg-primary px-5 font-semibold text-white transition hover:opacity-90"
-        @click="load"
-      >
-        Tekrar dene
-      </button>
-    </div>
+      class="mt-6"
+      :message="errorMessage"
+      retryable
+      :home-link="false"
+      @retry="load"
+    />
 
     <p v-else-if="categories.length === 0" class="mt-6 rounded-2xl bg-surface p-5 text-muted">
       Henüz kategori yok.

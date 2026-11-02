@@ -41,18 +41,31 @@ Bu makinede Node.js taşınabilir kurulu: `C:\Users\Süleyman\RapidQuizTools\nod
 src/
   api/          client.ts (axios + interceptor), errors.ts (ApiError), types.ts, schema.d.ts (üretilmiş),
                 categories.ts, sessions.ts, leaderboard.ts
-  assets/styles/main.css   # Tailwind + renk/yazı tipi token'ları + hareketi azalt kuralı
-  components/   CategoryCard.vue  (planlı: QuestionCard, ChoiceButton, CountdownRing, ProgressDots,
-                                   ScoreBurst, NameForm, LeaderboardTable)
-  composables/  (planlı: useCountdown.ts, useKeyboardAnswers.ts)
-  lib/          color.ts (safeColor/tint), categoryIcons.ts
-  router/       index.ts (createAppRouter fabrikası, sayfa başlıkları)
-  stores/       (planlı: quiz.ts)
-  views/        HomeView (hazır), QuizView / ResultView / LeaderboardView (iskelet)
-tests/          api, components, lib, views, router (src'yi yansıtır), setup.ts
+  assets/styles/main.css   # Tailwind + renk/yazı tipi token'ları + oyun animasyonları + hareketi azalt kuralı
+  components/   CategoryCard, ReadyCountdown, CountdownRing, ProgressDots, ChoiceButton, QuestionCard,
+                ScoreBurst, NameForm, LeaderboardTable, ConfirmDialog, ErrorMessage
+  composables/  useCountdown (rAF + setTimeout yedeği), useKeyboardAnswers (1–4), useCountUp
+  lib/          color.ts (safeColor/tint), categoryIcons.ts, format.ts (süre, tarih)
+  router/       index.ts (createAppRouter fabrikası, sayfa başlıkları, /result koruması)
+  stores/       quiz.ts (oyunun tüm durumu: oturum, soru, geçmiş, sonuç, skor kaydı)
+  views/        HomeView, QuizView, ResultView, LeaderboardView
+tests/          api, components, composables, lib, stores, views, router (src'yi yansıtır);
+                fixtures.ts (veri üreticileri), helpers.ts (mountApp, sahte saat), setup.ts
 ```
 
 Rotalar: `/` ana sayfa, `/quiz/:category`, `/result`, `/leaderboard/:category?`; bilinmeyen adres `/`'e döner. Quiz sayfasından çıkarken (geri tuşu dahil) "Quiz bitecek, emin misin?" onayı gösterilecek.
+
+## Oyun akışı (`stores/quiz.ts`, `views/QuizView.vue`)
+
+Evreler: `idle → starting → ready (3-2-1) → loading → question → answering → feedback → loading → … → finished`; hata olursa `error`. Önemli kararlar:
+
+- **Süre ilk soruyla başlar:** "Hazır ol" sırasında soru istenmez; sunucu süreyi `GET /question/` isteğinde başlatır.
+- Sayaç (`useCountdown`) sunucunun `remaining_ms` değeriyle başlar; `requestAnimationFrame` ile çizilir, süre dolması ayrıca `setTimeout` ile güvence altındadır (pencere arka plandayken rAF kısıtlanır). Dolunca `choice_id: null` gönderilir.
+- Cevap sırasında şıklar kilitlenir (`phase !== 'question'`); aynı soruya art arda tıklama/tuş tek istek gönderir. Geri bildirim 900 ms sürer, sonra `advance()` sıradaki soruyu ya da sonucu getirir.
+- Hata yönetimi: geçici hatalar (`network_error`, `timeout`, `server_error`) "Tekrar dene" ile aynı adımı yineler (cevap hatasında aynı şıkla). `already_answered` hata sayılmaz, sıradaki soruya geçilir (puan bir sonraki sorunun `current_score` alanından senkronlanır). `session_expired` vb. için "Yeniden başla" sunulur.
+- **Çıkış onayı:** quiz aktifken (hazır ol dahil) rota değişimi ya da tarayıcı geri tuşu "Quiz bitecek, emin misin?" penceresini açar (`onBeforeRouteLeave`, async guard); sekme kapatma/yenileme `beforeunload` uyarısı verir. Sayfa yenilenirse oturum anahtarı bellekte olduğundan oyun kaybolur (yeni oyun başlar).
+- Sonuç sayfasına yalnızca biten quiz varken girilir (router koruması). İsim formu istemci tarafında da doğrulanır (sunucu kurallarıyla aynı), asıl doğrulama sunucudadır; gönderim sürerken ikinci gönderim yok sayılır.
+- Skor tablosunda kendi satırın `rank + puan + isim` eşleşmesiyle vurgulanır; ilk 10'a girildiyse konfeti (tembel yüklenir, `disableForReducedMotion`) bir kez patlar; ilk 10 dışındaysa sıran ayrıca gösterilir.
 
 ## Tasarım (proje dokümanı, bölüm 11)
 
@@ -67,11 +80,11 @@ Açık, ferah zemin; doygun, enerjik renkler; koyu tema varsayılan değil. Toke
 ## Yol haritası (Aşama 4)
 
 - [x] Vite + Vue 3 + TypeScript + Tailwind kurulumu, renk token'ları
-- [x] API katmanı (tipler OpenAPI'den), ana sayfa kategori listesi
-- [ ] Pinia store (oturum, mevcut soru, puan), quiz ekranı (hazır ol, sayaç, ilerleme, geri bildirim)
-- [ ] Sonuç ekranı + isim formu, skor tablosu
-- [ ] Animasyonlar, klavye kısayolları, erişilebilirlik cilası
-- [ ] Playwright ile tam bir quiz akışı testi (backend'e karşı)
+- [x] API katmanı (tipler OpenAPI'den), Pinia store
+- [x] Ana sayfa, quiz ekranı (hazır ol, sayaç, ilerleme, geri bildirim), sonuç, skor tablosu
+- [x] Animasyonlar, klavye kısayolları, erişilebilirlik (hareketi azalt, odak halkası, `aria-live`)
+- [ ] Playwright ile tam bir quiz akışı testi (backend'e karşı; tarayıcı indirmesi gerekir)
+- [ ] Gerçek telefonda 5 saniye ve ağ toleransı testi (Aşama 5)
 
 ## Deploy (DigitalOcean App Platform static site)
 

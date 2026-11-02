@@ -22,6 +22,10 @@
   --color-cat-ulkeler: #ff8a3d;
   --color-cat-fizik: #ec4899;
 
+  /* Skor tablosu madalyaları (altın, `warning` rengidir) */
+  --color-medal-silver: #cbd2dc;
+  --color-medal-bronze: #e3a672;
+
   --radius-choice: 1rem;
 }
 
@@ -51,6 +55,100 @@
     outline: 3px solid var(--color-primary);
     outline-offset: 2px;
   }
+}
+
+/* --- Oyun animasyonları --------------------------------------------------------- */
+
+/* Yanlış şık hafifçe sallanır */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-8px);
+  }
+  40% {
+    transform: translateX(7px);
+  }
+  60% {
+    transform: translateX(-5px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+/* Kazanılan puan yukarı süzülüp kaybolur */
+@keyframes float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.9);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0) scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-44px) scale(1);
+  }
+}
+
+/* Sayaçta son 2 saniyede hafif nabız */
+@keyframes soft-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.anim-shake {
+  animation: shake 0.45s ease-in-out;
+}
+
+.anim-float-up {
+  animation: float-up 0.9s ease-out forwards;
+}
+
+.anim-soft-pulse {
+  animation: soft-pulse 0.7s ease-in-out infinite;
+}
+
+.anim-pop-in {
+  animation: pop-in 0.25s ease-out;
+}
+
+/* Sorular sağdan kayarak gelir */
+.slide-enter-active,
+.slide-leave-active {
+  transition:
+    transform 0.28s ease,
+    opacity 0.28s ease;
+}
+
+.slide-enter-from {
+  opacity: 0;
+  transform: translateX(32px);
+}
+
+.slide-leave-to {
+  opacity: 0;
+  transform: translateX(-32px);
 }
 
 /* Hareketi azalt: sallanma, kayma, konfeti vb. animasyonlar kapanır. */

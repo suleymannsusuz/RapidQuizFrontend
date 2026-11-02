@@ -15,6 +15,8 @@ export default defineConfig([
   },
   {
     rules: {
+      // Tanımsız değişkenleri TypeScript denetler; ESLint tarayıcı global'larını (window, ...) tanımaz
+      'no-undef': 'off',
       // Sayfa adları tek sözcük olabilir (Home, Quiz, ...)
       'vue/multi-word-component-names': 'off',
       // v-html güvenlik kuralı: oyuncu adı gibi içerik asla HTML olarak basılmaz.

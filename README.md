@@ -16,10 +16,10 @@ Backend'i ayrı repodan çalıştır (`docker compose up`, ardından `migrate` v
 
 ## Komutlar
 
-| Komut | Ne yapar |
-| --- | --- |
-| `npm run dev` | Geliştirme sunucusu (port 5173) |
-| `npm run build` | Tip denetimi + üretim derlemesi (`dist/`) |
-| `npm test` | Birim ve bileşen testleri (Vitest) |
-| `npm run lint` / `npm run format` | ESLint / Prettier |
-| `npm run gen:api` | Backend OpenAPI şemasından API tiplerini üretir |
+| Komut                             | Ne yapar                                        |
+| --------------------------------- | ----------------------------------------------- |
+| `npm run dev`                     | Geliştirme sunucusu (port 5173)                 |
+| `npm run build`                   | Tip denetimi + üretim derlemesi (`dist/`)       |
+| `npm test`                        | Birim ve bileşen testleri (Vitest)              |
+| `npm run lint` / `npm run format` | ESLint / Prettier                               |
+| `npm run gen:api`                 | Backend OpenAPI şemasından API tiplerini üretir |
