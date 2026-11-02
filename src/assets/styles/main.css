@@ -1,0 +1,66 @@
+@import 'tailwindcss';
+
+/* Renk ve yazı tipi token'ları: proje dokümanı, bölüm 11. Tailwind bunlardan
+   bg-primary, text-ink, font-display gibi sınıflar üretir. */
+@theme {
+  --font-display: 'Outfit Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
+
+  --color-canvas: #f7f5ff;
+  --color-surface: #ffffff;
+  --color-primary: #7c3aed;
+  --color-accent: #ff4d8d;
+  --color-success: #16c79a;
+  --color-warning: #ffc531;
+  --color-ink: #1e1b4b;
+  --color-muted: #6b6890;
+
+  /* Kategori renkleri; asıl renk API'den gelir (categories.color), bunlar yedektir. */
+  --color-cat-yazilim: #3b82f6;
+  --color-cat-yapay-zeka: #8b5cf6;
+  --color-cat-bilgisayar-muhendisligi: #14b8a6;
+  --color-cat-ulkeler: #ff8a3d;
+  --color-cat-fizik: #ec4899;
+
+  --radius-choice: 1rem;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-canvas);
+  }
+
+  body {
+    min-height: 100vh;
+    margin: 0;
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    /* Hafif lavanta → pembe gradyan */
+    background: linear-gradient(160deg, #f7f5ff 0%, #fdeef6 100%) fixed;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+
+  /* Görünür odak halkası (klavye ve ekran okuyucu kullanıcıları için) */
+  :focus-visible {
+    outline: 3px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Hareketi azalt: sallanma, kayma, konfeti vb. animasyonlar kapanır. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

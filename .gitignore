@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.venv/
+.idea/
+.env
+.env.local
+*.local
+*.tsbuildinfo
+coverage/
+playwright-report/
+test-results/
+npm-debug.log*

@@ -1,0 +1,6 @@
+dist
+node_modules
+.venv
+.idea
+package-lock.json
+src/api/schema.d.ts
