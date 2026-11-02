@@ -13,8 +13,10 @@ export default defineConfig({
   // Backend IP başına dakikada 10 oturum açtırır; testler sırayla çalışır
   fullyParallel: false,
   workers: 1,
-  retries: 0,
-  reporter: [['list']],
+  // CI'da kazara bırakılmış test.only başarısız sayılır; gerçek zamanlı testler için tek yeniden deneme
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 1 : 0,
+  reporter: process.env.CI ? [['github'], ['list'], ['html', { open: 'never' }]] : [['list']],
   use: {
     baseURL: 'http://127.0.0.1:5173',
     locale: 'tr-TR',
@@ -25,7 +27,7 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev -- --host 127.0.0.1',
     url: 'http://127.0.0.1:5173',
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
     timeout: 60_000,
   },
 })

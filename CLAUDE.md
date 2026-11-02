@@ -93,6 +93,12 @@ Açık, ferah zemin; doygun, enerjik renkler; koyu tema varsayılan değil. Toke
 
 Doğru cevapları bilmeye gerek yoktur: testler her cevapta kazanılan puanın kurala uyduğunu (doğruysa 100–150, yanlışsa 0) ve nihai puanın sonuç ekranında ve skor tablosunda aynı göründüğünü denetler. Kapsam: tam oyun (isim reddi dahil), süre aşımı, klavye kısayolu, geri tuşu/çıkış onayı, bilinmeyen kategori, sekmeler, telefon boyutunda taşma ve dokunma hedefi/yazı boyutu, hareketi azalt. `e2e/` Vitest'e girmez (yalnızca `tests/` toplanır) ve kendi `tsconfig.e2e.json`'ı vardır. Bir testin gerçekten bir şeyi denetlediğinden emin olmak için ilgili davranışı geçici bozup testin düştüğünü gör (çıkış onayı için yapıldı).
 
+## CI (GitHub Actions)
+
+`.github/workflows/ci.yml` her pull request'te ve `main`'e push'ta çalışır, iki iş: **"Denetimler ve birim testler"** (Prettier, tip denetimi, ESLint, Vitest, üretim derlemesi) ve **"Uçtan uca testler (Playwright)"** (backend repo'sunun `main` dalını çekip `docker compose up` ile ayağa kaldırır, `migrate` + `load_questions` yapar, Chromium kurar, 12 E2E testi koşar; başarısızlıkta Playwright raporu ve backend günlükleri saklanır). E2E işi backend'in `main` dalına bağlıdır: backend API'sini kıran bir değişiklik burada da kırmızı görünür. Güvenlik: yalnızca `contents: read`, kimlik bilgisi saklanmaz, Action'lar **commit SHA'sıyla sabitli**. Dependabot haftalık PR açar (TypeScript ana sürüm yükseltmesi bilerek kapalı).
+
+**Dal koruması** (GitHub → Settings → Branches → `main`): "Require a pull request before merging", "Require status checks to pass" (yukarıdaki iki işin adı), "Do not allow bypassing". Koruma açılınca `main`'e doğrudan push yapılamaz; değişiklikler dal + PR ile gelir.
+
 ## Deploy (DigitalOcean App Platform static site)
 
 `.do/app.yaml`: `npm ci && npm run build`, `dist/` yayınlanır. `catchall_document: index.html` zorunlu (Vue Router history modu). Backend adresi `VITE_API_BASE_URL` (BUILD_TIME) ile verilir; değişirse yeniden build gerekir. `main` dalı korunmalı: `deploy_on_push` testlerden bağımsız yayına alır.
