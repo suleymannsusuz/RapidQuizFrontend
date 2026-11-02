@@ -27,6 +27,7 @@ npm run type-check     # vue-tsc --build
 npm run lint           # ESLint
 npm run format         # Prettier (format:check: yalnızca denetler)
 npm test               # Vitest (birim ve bileşen testleri)
+npm run test:e2e       # Playwright (gerçek tarayıcı + çalışan backend gerekir; bkz. aşağıda)
 npm run build          # type-check + vite build → dist/
 npm run gen:api        # backend OpenAPI şemasından src/api/schema.d.ts üretir
 ```
@@ -83,8 +84,14 @@ Açık, ferah zemin; doygun, enerjik renkler; koyu tema varsayılan değil. Toke
 - [x] API katmanı (tipler OpenAPI'den), Pinia store
 - [x] Ana sayfa, quiz ekranı (hazır ol, sayaç, ilerleme, geri bildirim), sonuç, skor tablosu
 - [x] Animasyonlar, klavye kısayolları, erişilebilirlik (hareketi azalt, odak halkası, `aria-live`)
-- [ ] Playwright ile tam bir quiz akışı testi (backend'e karşı; tarayıcı indirmesi gerekir)
+- [x] Playwright ile tam bir quiz akışı testi (`e2e/`, backend'e karşı; 12 test)
 - [ ] Gerçek telefonda 5 saniye ve ağ toleransı testi (Aşama 5)
+
+## Uçtan uca testler (`e2e/`, Playwright)
+
+`playwright.config.ts`: Chromium (headless shell), tek işçi (backend IP başına dakikada 10 oturum açtırır). `e2e/global-setup.ts` backend yoksa ya da kategori yüklenmemişse anlaşılır bir mesajla durur. Testler gerçek zamanlıdır ve gerçek backend'e yazar: tam oyun testleri dev veritabanına `e2e_...` adlı skor bırakır (temizleme komutu `README.md`'de).
+
+Doğru cevapları bilmeye gerek yoktur: testler her cevapta kazanılan puanın kurala uyduğunu (doğruysa 100–150, yanlışsa 0) ve nihai puanın sonuç ekranında ve skor tablosunda aynı göründüğünü denetler. Kapsam: tam oyun (isim reddi dahil), süre aşımı, klavye kısayolu, geri tuşu/çıkış onayı, bilinmeyen kategori, sekmeler, telefon boyutunda taşma ve dokunma hedefi/yazı boyutu, hareketi azalt. `e2e/` Vitest'e girmez (yalnızca `tests/` toplanır) ve kendi `tsconfig.e2e.json`'ı vardır. Bir testin gerçekten bir şeyi denetlediğinden emin olmak için ilgili davranışı geçici bozup testin düştüğünü gör (çıkış onayı için yapıldı).
 
 ## Deploy (DigitalOcean App Platform static site)
 
