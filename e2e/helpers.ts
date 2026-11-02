@@ -2,6 +2,9 @@ import { expect, type Locator, type Page } from '@playwright/test'
 
 export const QUESTION_COUNT = 20
 
+/** Backend API adresi (testler hem arayüzü hem API'yi doğrudan kullanır). */
+export const API_URL = process.env.E2E_API_URL ?? 'http://localhost:8000/api/v1'
+
 /** Ana sayfadan bir kategori seçip quiz'i başlatır ("Hazır ol" görünene kadar bekler). */
 export async function startQuiz(page: Page, slug: string) {
   await page.goto('/')
@@ -34,11 +37,16 @@ export function feedback(page: Page): Locator {
 /**
  * Tüm soruları sırayla cevaplar (her soruda farklı bir şık). Her cevapta kazanılan puanın
  * kurallara uyduğunu denetler: doğruysa 100–150, yanlışsa 0. Nihai puanı döner.
+ *
+ * `thinkMs`: her soruda cevap vermeden önce beklenen süre. Backend, soru başına ortalama
+ * cevap süresi 500 ms'nin altında olan skorları "bot" sayıp kaydetmez; bu yüzden varsayılan
+ * değer gerçekçi bir oyuncuyu taklit eder.
  */
-export async function playAllQuestions(page: Page): Promise<number> {
+export async function playAllQuestions(page: Page, { thinkMs = 700 } = {}): Promise<number> {
   let previous = 0
   for (let position = 1; position <= QUESTION_COUNT; position++) {
     const card = await waitForQuestion(page, position)
+    if (thinkMs > 0) await page.waitForTimeout(thinkMs)
     await card
       .getByRole('button')
       .nth(position % 4)

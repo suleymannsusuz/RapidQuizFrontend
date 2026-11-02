@@ -175,6 +175,26 @@ describe('isim formu', () => {
     expect(wrapper.get('[role="alert"]').text()).toBe('Sunucuya ulaşılamadı.')
   })
 
+  it('bot önlemi skoru reddederse sunucu mesajını gösterir ve sayfada kalır', async () => {
+    vi.mocked(submitScore).mockRejectedValue(
+      new ApiError(
+        'score_rejected',
+        'Cevapların insan için fazla hızlıydı, skor kaydedilemedi.',
+        422,
+      ),
+    )
+    const { wrapper, router, store } = await openResult()
+
+    await submitName(wrapper, 'Ayşe')
+    await tick()
+
+    expect(wrapper.get('[role="alert"]').text()).toBe(
+      'Cevapların insan için fazla hızlıydı, skor kaydedilemedi.',
+    )
+    expect(router.currentRoute.value.name).toBe('result')
+    expect(store.submitted).toBeNull()
+  })
+
   it('gönderilirken düğme kapanır (çift kayıt olmaz)', async () => {
     vi.mocked(submitScore).mockReturnValue(new Promise(() => {}))
     const { wrapper } = await openResult()

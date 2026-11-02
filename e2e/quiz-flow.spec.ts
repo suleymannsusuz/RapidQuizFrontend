@@ -6,6 +6,8 @@ import {
   playAllQuestions,
   startQuiz,
   waitForQuestion,
+  API_URL,
+  QUESTION_COUNT,
 } from './helpers'
 
 test.describe('tam oyun', () => {
@@ -57,6 +59,38 @@ test.describe('tam oyun', () => {
     } else {
       await expect(outsideBox.locator('..')).toContainText(`${finalScore} puan`)
     }
+  })
+
+  // Gerçek bir bot arayüzü kullanmaz, API'yi doğrudan çağırır. (Arayüzden "anında" oynamak
+  // mümkün değil: Playwright tıklamadan önce kartın kayarak yerleşmesini bekler.)
+  test("API'yi anında oynayan istemcinin skoru kaydedilmez (bot önlemi)", async ({ request }) => {
+    const created = await request.post(`${API_URL}/sessions/`, {
+      data: { category: 'fizik', platform: 'web' },
+    })
+    expect(created.status()).toBe(201)
+    const session = await created.json()
+    const headers = { 'X-Session-Token': session.session_token }
+    const base = `${API_URL}/sessions/${session.session_id}`
+
+    for (let position = 0; position < QUESTION_COUNT; position++) {
+      const question = await (await request.get(`${base}/question/`, { headers })).json()
+      const answer = await request.post(`${base}/answer/`, {
+        headers,
+        data: { question_id: question.question.id, choice_id: question.choices[0].id },
+      })
+      expect(answer.status()).toBe(200)
+    }
+
+    const name = e2eName()
+    const rejected = await request.post(`${base}/score/`, { headers, data: { player_name: name } })
+    expect(rejected.status()).toBe(422)
+    expect((await rejected.json()).error.code).toBe('score_rejected')
+
+    // Skor tablosuna hiçbir şey yazılmadı
+    const board = await (await request.get(`${API_URL}/leaderboard/?category=fizik`)).json()
+    expect(board.leaderboard.map((row: { player_name: string }) => row.player_name)).not.toContain(
+      name,
+    )
   })
 
   test('sonuç sayfası yenilenirse oyun kaybolur ve ana sayfaya dönülür', async ({ page }) => {
